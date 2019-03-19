@@ -32,7 +32,9 @@
 	crossorigin="anonymous">
 	<link rel="stylesheet" href="assets/css/floatButton.css">
 
-	<script type="text/javascript" src="http://cryptojs.altervista.org/api/functions_cryptography.js"></script>  
+	<script type="text/javascript" src="assets/js/CryptoJS/components/core.js"></script>    
+	<script type="text/javascript" src="assets/js/CryptoJS/components/md5.js"></script>   
+	
 
 	<script src="assets/js/Chart.bundle.js"></script>
 	<script src="assets/js/Chart.bundle.min.js"></script>
@@ -524,8 +526,10 @@
             }
 		});
 	}
+	
 
-	Crypt = new Crypt();
+	const Crypt = CryptoJS;
+	
 	const myFillColor = ['rgba(2, 170, 242, 0.4)','rgba(6, 242, 2, 0.4)','rgba(242, 2, 2, 0.4)'];
 	const myBordorColor = ['rgba(2, 170, 242, 1)','rgba(6, 242, 2, 1)','rgba(242, 2, 2, 1)'];
 
@@ -673,7 +677,7 @@
 		var path = 'users/{uid}/device/';
 		var d_name = $('#deviceName').val();
 		var d_type = $('#deviceType').val();
-		var secret = Crypt.HASH.md5(timestamp+name+datetime);   
+		var secret = Crypt.MD5(timestamp+name+datetime);   
         var data = {
             name: d_name,
             type: d_type,

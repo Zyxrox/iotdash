@@ -3,45 +3,29 @@ var admin = require('firebase-admin');
 var express = require('express');
 var app = express();
 var firebase = admin.initializeApp(functions.config().firebase);
-
-exports.widget = functions.https.onRequest((req, res) => {
-    res.redirect('../widget.html');
-});
   
 exports.helloWorld = functions.https.onRequest((req, res) => {
     res.send("Hello from Firebase!");
 });
-exports.addData = functions.https.onRequest((req, res) => {
-    // Grab the text parameter.
-    // var name = req.query.name;
-    // var val = req.query.value;
-    var text = req.originalUrl;
+exports.addPlantData = functions.https.onRequest((req, res) => {
+    var humid = req.query.humid;
+    var temp = req.query.temp;
+    var light = req.query.light;
+    var secret = req.query.secret;
+    var url = req.originalUrl;
+    var date = genDatetime();
 
-    var dayFormat = new Date();
-
-    // js date
-    var date =
-        dayFormat.getDate().toString() +
-        '-' +
-        (dayFormat.getMonth() + 1) +
-        '-' +
-        (dayFormat.getFullYear() + 543);
-
-    var time =
-        dayFormat.getHours().toString() +
-        ':' +
-        dayFormat.getMinutes().toString();
-
-    res.status(200).send("url = "+text);
-    // Push the new message into the Realtime Database using the Firebase Admin SDK.
-    // return admin.database().ref('tele/').push({
-    //     data_name: name,
-    //     value: val,
-    //     time: date + " " + time,
-    // }).then((snapshot) => {
-    //     // Redirect with 303 SEE OTHER to the URL of the pushed object in the Firebase console.
-    //     return res.redirect(303, snapshot.ref.toString());
-    // });
+    // res.status(200).send("url = "+text);
+    return admin.database().ref('testAPI/'+secret+'/').push().set({
+        humid: humid,
+        temp: temp,
+        light: light,
+        time: date,
+        timestamp: admin.database.ServerValue.TIMESTAMP
+    }).then((snapshot) => {
+        // return res.redirect(303, snapshot.ref.toString());
+        return res.status(200).send("url = "+url);
+    });
 });
 exports.posts = functions.https.onRequest((req, res) => {
     var postsRef = firebase.database().ref('tele/');
@@ -59,8 +43,22 @@ exports.testURL = functions.https.onRequest((req, res) => {
     res.end("url = "+text);
 });
 
+function genDatetime(){
+    var dayFormat = new Date();
 
-exports.cloneDash = functions.https.onRequest((req, res) => {
-    var secret = req.query.secret;
-    res.status(200).send();
-});
+    var date =
+        dayFormat.getDate().toString() +
+        '-' +
+        (dayFormat.getMonth() + 1) +
+        '-' +
+        (dayFormat.getFullYear() + 543);
+
+    var time =
+        dayFormat.getHours().toString() +
+        ':' +
+        dayFormat.getMinutes().toString() +
+        ':' +
+        dayFormat.getMilliseconds().toString();
+
+    return date+" "+time;
+}

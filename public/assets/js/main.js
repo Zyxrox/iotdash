@@ -85,6 +85,8 @@ var mainApp = {};
             type: type
         };
         app_firebase.databaseApi.create(path, data, massageHandler);
+        path = 'dashboard/' + secret + '/';
+        app_firebase.databaseApi.create(path, data, massageHandler);
     }
 
     function updateDevice(newName,key) {
@@ -110,11 +112,10 @@ var mainApp = {};
     }
 
     function addWidget(type, mData, secret) {
-        var path = 'users/' + uid + '/dashboard/';
+        var path = 'dashboard/' + secret + '/';
         var data = {
             type: type,
             data: mData,
-            device: secret
         };
         app_firebase.databaseApi.push(path, data, massageHandler);
         console.log('added widget...');
