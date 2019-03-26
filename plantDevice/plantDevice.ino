@@ -1,16 +1,16 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
-#include <FirebaseArduino.h>
+#include "FirebaseESP8266.h"
 
 #include <ESP8266WiFi.h>
 #include <ESP8266WiFiMulti.h>
 #include <ESP8266HTTPClient.h>
-#include <WiFiClientSecureBearSSL.h>
+#include <time.h>
 
 #define FIREBASE_HOST "iotdash.firebaseapp.com"
 #define FIREBASE_AUTH "AIzaSyD-6IzYBipiBsBqmLCDizMG4w3zK273LBw"
-#define WIFI_SSID "SSID"
-#define WIFI_PASSWORD "PASSWORD"
+
+FirebaseData firebaseData;
 
 ESP8266WiFiMulti wifiMulti;
 HTTPClient http;
@@ -26,21 +26,54 @@ void setup() {
   wifiMulti.addAP("Jubjam", "Jamnaja0");
   
   Serial.println("Connecting Wifi");
+
+  configTime(timezone, dst, "pool.ntp.org", "time.nist.gov"); //ดึงเวลาจาก Server
+  Serial.println("\nLoading time");
+  while (!time(nullptr)) {
+    Serial.print("*");
+  }
   
 }
 
-String secret = "testSecret";
+String NowString()
+{
+  time_t now = time(nullptr);
+  struct tm* newtime = localtime(&now);
+
+ // String tmpNow = "";
+  
+ // tmpNow += String(newtime->tm_hour);
+  //tmpNow += ":";
+  //tmpNow += String(newtime->tm_min);
+ // tmpNow += ":";
+//  tmpNow += String(newtime->tm_sec);
+//  tmpNow += ":";
+  String tmpNow = String()+(newtime->tm_hour<10 ? "0":"")+newtime->tm_hour+':'+(newtime->tm_min<10?"0":"")+newtime->tm_min+':'+(newtime->tm_sec<10?"0":"")+newtime->tm_sec;
+  return tmpNow;
+}
+String NowString1()
+{
+  time_t now = time(nullptr);
+  struct tm* newtime = localtime(&now);
+
+//  String tmpNow = "";
+//  
+//  tmpNow += String(newtime->tm_mday);
+//  tmpNow += ":";
+//  tmpNow += String(newtime->tm_mon+1);
+//  tmpNow += ":";
+//  tmpNow += String(newtime->tm_year+1900);
+  String tmpNow = String()+(newtime->tm_mday<10 ? "0":"")+newtime->tm_mday+"-"+((newtime->tm_mon+1)<10?"0":"")+(newtime->tm_mon+1)+"-"+(newtime->tm_year+2443); //01
+  return tmpNow;
+}
+
+String secret = "";
 int humid = 1;
 int temp = 2;
 int light = 3;
-String payload;
 String data;
 
 void loop() {
-
-  std::unique_ptr<BearSSL::WiFiClientSecure>client(new BearSSL::WiFiClientSecure);
-
-    client->setFingerprint(fingerprint);
 
   while(wifiMulti.run() != WL_CONNECTED) {
     Serial.print("Can't connect to Wi-Fi...");
@@ -52,30 +85,27 @@ void loop() {
     Serial.println(WiFi.localIP());
     }
   }
-  data = "humid="+String(humid)+"&temp="+String(temp)+"&light="+String(light)+"&secret="+secret;
-  
-  //String data = "soil="+String(soilValue)+"&light="+String(lux)+"&humidity="+String(Humidity)+"&temperature="+String(Temperature)+"&datenow="+String(datenow)+"&timenow="+String(timenow);
+  timestamp = NowString()+ " " + NowString1();
+  data = "{ \"humid\":" + String(humid) + ",\"light\":" + String(light) + ",\"temp\":" + String(temp) +",\"time\":"+timestamp+"}";
+  humid++;
+  temp++;
+  light++;
 
-//  http.begin(testAPI);
-  Serial.print("HTTP begin\n"); 
-  http.addHeader("Content-Type", "application/x-www-form-urlencoded");
-//  Serial.println("Post to " + urlnew);
-//  int httpCode = http.POST(data2);
-  int httpCode = http.GET();
-  Serial.print("Making HTTP request\n"); 
-  if(httpCode > 0) {
-    if(httpCode == HTTP_CODE_OK) {
-      Serial.print("HTTP Success\n"); 
-      payload = http.getString();
-      Serial.println(payload);
-      delay(10000);
+    if (Firebase.pushJSON(firebaseData, "telemetry/" + secret + "/", data))
+    {
+      Serial.println("----------Push result-----------");
+      Serial.println("PATH: " + firebaseData.dataPath());
+      Serial.print("PUSH NAME: ");
+      Serial.println(firebaseData.pushName());
+      Serial.println("--------------------------------");
+      Serial.println();
     }
-  } else {
-      Serial.print("HTTP FAILED\n"); 
-      Serial.println(http.errorToString(httpCode).c_str());
-      delay(10000);
-  }
-  Serial.print("HTTP End\n"); 
-  http.end();
+    else
+    {
+      Serial.println("----------Can't push data--------");
+      Serial.println("REASON: " + firebaseData.errorReason());
+      Serial.println("--------------------------------");
+      Serial.println();
+    }
       
 }
