@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-	<title>IoTDash</title>
+	<title>IoTDash:Dashboard</title>
 
 	<meta charset="utf-8" />
 	<link rel="icon" type="image/png" href="assets/img/favicon.ico">
@@ -27,6 +27,9 @@
 	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 	<link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.cyan-light_blue.min.css">
 	<link rel="stylesheet" href="assets/css/styles.css">
+
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/"
+	crossorigin="anonymous">
 	<link rel="stylesheet" href="assets/css/floatButton.css">
 
 	<script type="text/javascript" src="assets/js/CryptoJS/components/core.js"></script>    
@@ -42,13 +45,13 @@
 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
-	<script src="https://www.gstatic.com/firebasejs/5.9.1/firebase-app.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/5.7.2/firebase-app.js"></script>
 
-	<script src="https://www.gstatic.com/firebasejs/5.9.1/firebase-auth.js"></script>
-	<script src="https://www.gstatic.com/firebasejs/5.9.1/firebase-database.js"></script>
-	<script src="https://www.gstatic.com/firebasejs/5.9.1/firebase-firestore.js"></script>
-	<script src="https://www.gstatic.com/firebasejs/5.9.1/firebase-messaging.js"></script>
-	<script src="https://www.gstatic.com/firebasejs/5.9.1/firebase-functions.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/5.7.2/firebase-auth.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/5.7.2/firebase-database.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/5.7.2/firebase-firestore.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/5.7.2/firebase-messaging.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/5.7.2/firebase-functions.js"></script>
 
 	<script src="assets/js/firebase.js"></script>
 	<script src="assets/js/main.js"></script>
@@ -57,17 +60,47 @@
 
 <body>
 	<div class="wrapper">
-		<div class="main-panel" style="float: none;width: 100%;">
+		<div class="sidebar" data-color="blue">
+			<div class="sidebar-wrapper">
+				<div class="logo">
+					<a href="index.html" class="simple-text">
+						IoTDash
+					</a>
+				</div>
+				<ul class="nav">
+					<li class="active">
+						<a href="#" id="navDash">
+							<i class="fas fa-chart-pie"></i>
+							<p>Dashboard</p>
+						</a>
+					</li>
+					<li>
+						<a href="#" id="navDevice">
+							<i class="fas fa-microchip"></i>
+							<p>Device</p>
+						</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+		<div class="main-panel">
 			<nav class="navbar navbar-default navbar-fixed">
-				<div class="container">
-					<div class="navbar-header">	
-						<a href="#" class="navbar-brand">IoTDash</a>
+				<div class="container-fluid">
+					<div class="navbar-header">
+						<button type="button" class="navbar-toggle" data-toggle="collapse">
+							<span class="sr-only">Toggle navigation</span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+						</button>
+						<p class="navbar-brand">Dashboard</p>
 					</div>
 					<div class="collapse navbar-collapse">
 						<ul class="nav navbar-nav navbar-right">
 							<li class="dropdown">
 								<a href="#" class="dropdown-toggle profile" data-toggle="dropdown">
 									
+									<b class="caret"></b>
 								</a>
 								<ul class="dropdown-menu">
 									<li><a href="#">Profile</a></li>
@@ -79,63 +112,70 @@
 					</div>
 				</div>
 			</nav>
-			<div class="container content">
-				<div class="col-md-12">
-					<div class="header">
-						<a style="text-decoration: underline;" href="#" class="navbar-brand device-home">Device</a>
-						<p id="pPointer" class="navbar-brand" style="display: none;">></p>
-						<a id="device-element" href="#" class="navbar-brand dashboardBtn" style="display: none;" ></a>
+			<div class="content">
+				<!-- DASHBOARD -->
+				<div id="dashContainer" class="container-fluid">
+					<div class="row" style="height:50%;">
+						
+						<div class="col-md-6" style="display: none;">
+							<div class="card card-theme">
+								<canvas id="lineChart"></canvas>
+							</div>
+						</div>
+						<div class="col-md-6" style="display: none;">
+							<div class="card card-theme">
+								<canvas id="barChart"></canvas>
+							</div>
+						</div>
+					</div>	
+					<div class="row">
+						<div class="col-md-6">
+							<div class="card card-theme">
+								<canvas id="newChart"></canvas>
+							</div>
+						</div>
+						<button id="addWidgetBtn" type="button" class="btn btn-primary" data-toggle="modal" data-target="#widgetForm">
+							Add New Gadget
+						</button>
+						<!-- <button type="button" class="btn btn-primary" onclick="genData()">
+								Generate Random Data
+						</button> -->
+						<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#deployModal" onclick="deployClone()">
+								Deploy Dashboard
+						</button>
+						<button type="button" class="btn btn-primary" onclick="genPlant(secret)">
+								Generate a Plant Data
+						</button>
 					</div>
 				</div>
-				<!-- DASHBOARD -->
-				<div id="dashContainer" class="container-fluid" style="display: none;">
-					<div class="row">
-						<div  class="card col-md-12">
-							<!-- style="padding-top:10px" -->
-							<h3>
-								Cuztomize Dashboard
-								<button id="addWidgetBtn" type="button" class="btn btn-primary pull-right" data-toggle="modal" data-target="#widgetForm">
-									Add New Gadget
-								</button>
-								<button id="deploy" type="button" class="btn btn-primary" data-toggle="modal" data-target="#deployModal">
-									Deploy Dashboard
-								</button>
-								<button type="button" class="btn btn-primary" onclick="genPlant(keyStore)">
-									Generate a Plant Data
-								</button>
-							</h3>
-						</div>
-						<div id="widgetCard">
-
-						</div>
-					</div>		
-				</div>
 				<!-- DEVICE -->
-				<div id="deviceContainer" class="container-fluid">
+				<div id="deviceContainer" class="container-fluid" style="display: none;">
 					<div class="row">
-						<div  class="card col-md-12">
-							<!-- style="padding-top:10px" -->
-							<h3>
-								List of Your Devices
-								
-								<button type="button" class="btn btn-primary pull-right"
-									data-toggle="modal" data-target="#deviceForm"">
-									Add New Device
-								</button>
-								<button style="margin-right: 0.5em" type="button" class="btn btn-primary pull-right device-home">
-									<i class="fas fa-sync"></i>
-								</button>
-							</h3>
-							<div id="deviceCard">
-								<!-- <div class="col-md-4">
-									<div class="card">
-										<div class="content">
-											<button type="button" class="btn btn-primary center-block device-home">
-												<i class="fas fa-sync"></i>
-											</button>
-										</div>
-									</div>
-								</div> -->
+						<div class="col-md-12">
+							<div class="card">
+								<div class="header">
+									<h4 class="title">Table of your IoT Devices
+										<button type="button" class="btn btn-primary pull-right"
+										data-toggle="modal" data-target="#deviceForm" style="margin-right:5em;">
+										Add New Device
+										</button>
+										
+									</h4>
+								</div>
+								<div class="content table-responsive table-full-width">
+									<table class="table table-hover table-striped">
+										<thead>
+											<th>Name</th>
+											<th>Type</th>
+											<th>Date Created</th>
+											<th>View Data</th>
+											<th>Edit</th>
+										</thead>
+										<tbody class="deviceTable">
+											
+										</tbody>
+									</table>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -145,6 +185,13 @@
 			<footer class="footer">
 				<div class="container-fluid">
 					<nav class="pull-left">
+						<!-- <ul>
+							<li>
+								<a href="#">
+									Home
+								</a>
+							</li>
+						</ul> -->
 					</nav>
 					<p class="copyright pull-right">
 						&copy; 2016 <a href="http://www.creative-tim.com">Creative Tim</a>, made with love for a better web
@@ -168,7 +215,12 @@
 						<select id="widgetType" class="form-control">
 							<option value="line">Line Chart</option>
 							<option value="bar">Bar Chart</option>
-							<option value="barAll">Bar Chart:All data</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<label for="label_widget">Device</label>
+						<select id="keepDevice" class="form-control">
+							
 						</select>
 					</div>
 					<div class="form-group">
@@ -183,7 +235,7 @@
 			</div>
 			<div class="modal-footer">
 			<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-			<button type="submit" class="btn btn-primary" data-dismiss="modal" onclick="addWidget(keyStore)">Add</button>
+			<button type="submit" class="btn btn-primary" data-dismiss="modal" onclick="addWidget()">Add</button>
 			</div>
 		</div>
 		</div>
@@ -278,12 +330,11 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-						<h4 class="modal-title" id="deviceEditLabel">Click to Copy to Your Server</h4>
+						<h4 class="modal-title" id="deviceEditLabel">Copy to Your Server</h4>
 					</div>
 					<div class="modal-body">
 						<div class="form-group">
-							<input class="form-control deployInput" type="text" readonly>
-								
+							<input id="deviceSecret" class="form-control" type="text" value="<iframe src='https://iotdash.firebaseapp.com/widget.html' frameborder='0' marginheight='0' marginwidth='0' width='100%'' height='100%'' scrolling='auto'></iframe></iframe>" readonly>
 						</div>
 					</div>
 				</div>
@@ -299,17 +350,36 @@
 
 <script>
 
-	$('.device-home').click(function( event ) {
+	$(document).ready(function() {
+		console.log('hello: ' + name);
+		$(".profile").html("Hello, 	" + name);
+	});
+
+	$('#navDash').click(function( event ) {
+		$('li.active').removeAttr('class');
+		$(this).parent().addClass("active");
+		$('p.navbar-brand').html('Dashboard');
+		$('#dashContainer').removeAttr('style');
+		$('#deviceContainer').css('display','none');
+	});
+
+	$('#navDevice').click(function( event ) {
+		$('li.active').removeAttr('class');
+		$(this).parent().addClass("active");
+		$('p.navbar-brand').html('Device');
 		$('#dashContainer').css('display','none');
 		$('#deviceContainer').removeAttr('style');
-		$('#pPointer').css('display','none');
-		$('#device-element').html('');
+		// $('#teleContainer').css('display','none');
 		listDevice();
 	});
 
 	$('#addWidgetBtn').click(function( event ) {
 		widgetModalConfig();
 	});
+
+	function deployClone() {
+		
+	}
 
 	function widgetModalConfig() {
 		var database = firebase.database();
@@ -325,46 +395,15 @@
 		});
 	}
 
-	$(document).on('click', '.dashboardBtn', function(e) {
-		$('#dashContainer').removeAttr('style');
-		$('#deviceContainer').css('display','none');
-		$('#pPointer,#device-element').removeAttr('style');
-		var d_name = $(this).attr("d_name");
-		$('#device-element').html(d_name);
-		if ($(this).attr("key")) {
-			keyStore = $(this).attr("key");
-			$('#device-element').attr('key',keyStore);
-		}
-		$('#widgetCard').html('');
-		callChart(keyStore);
-	});
+	
+
 	$(document).on('click', '#deviceEditBtn', function(e) {
 		keyStore = $(this).attr("key");
 		deviceEditModalConfig(keyStore);
-		keyStore = '';
 	});
 	$(document).on('click', '#dataTableBtn', function(e) {
 		keyStore = $(this).attr("key");
 		dataTableModalConfig(keyStore);
-		keyStore = '';
-	});
-	$(document).on('click', '#widgetEditBtn', function(e) {
-		var secret = $('#device-element').attr('key');
-		keyStore = $(this).attr("key");
-		deleteWidget(secret, keyStore);
-		keyStore = '';
-	});
-	$(document).on('click', '#deploy', function(e) {
-		var key = $('#device-element').attr('key');
-		// var deployText = '<iframe src="http://localhost:5000/iotdash/us-central1/getDashboard?secret='+ key + '"frameborder="0" marginheight="0" marginwidth="0" width="100%" height="100%" scrolling="auto"></iframe>';
-		var deployText = '<iframe src="https://us-central1-iotdash.cloudfunctions.net/getDashboard?secret='+ key + '"frameborder="0" marginheight="0" marginwidth="0" width="100%" height="100%" scrolling="auto"></iframe>';
-		
-		$('input.deployInput').attr('value', deployText);
-	});
-	$('input.deployInput').css( 'cursor', 'pointer' );
-	$('input.deployInput').click(function( event ) {
-		this.select();
-		document.execCommand('copy');
 	});
 	
 	secret = '';
@@ -389,8 +428,6 @@
 	}
 
 	function listDevice() {
-		console.log('listing devices...'+uid);
-		
 		var database = firebase.database();
         database.ref("users/" + uid + "/device/").on('value', function (snapshot) {
             if (snapshot.exists()) {
@@ -399,56 +436,27 @@
                 snapshot.forEach(function (data) {
 					var val = data.val();
 					var type = val.type;
-					var secret = val.secret;
 					var key = data.key;
 					list_count++;
-					// console.log(val);
-					// console.log(secret);
+
 					type = transType(type);
 
-					content +='<div class="col-md-4" id=diviceList'+list_count+'>';
-					content +='	<div class="card">';
-					content +='		<div class="header">';
-					content +='			<h4 style="font-weight: 500;" class="title">' + val.name;
-					content +='				<button style="margin-right: 0.5em;" id="deviceEditBtn" type="button" class="close" data-toggle="modal" data-target="#deviceEdit" key="'+key+'"><i class="fas fa-edit"></i></button>';
-					content +='			</h4>';
-					content +='		</div>';
-					content +='		<div style="padding-top:0;" class="content">';
-					content +='			<div class="typo-line">';
-					content +='				<h5><p class="category">Type</p>'+type+'</h5>';
-					content +='			</div>';
-					content +='			<div class="typo-line">';
-					content +='				<h5><p class="category">Date Added</p>'+val.time+'</h5>';
-					content +='			</div>';
-					content +='			<div class="btn-group btn-group-justified" role="group" aria-label="...">';
-					content +='				<div class="btn-group" role="group">';
-					content +='					<button type="button" title="Telemetry Table" id="dataTableBtn" class="btn btn-primary" data-toggle="modal" data-target="#dataTable" style="margin-right:.5em;" key="'+secret+'">';
-					content +='						<!-- Telemetry -->';
-					content +='						<i class="fas fa-table"></i>';
-					content +='					</button>';
-					content +='				</div>';
-					content +='				<div class="btn-group" role="group">';
-					content +='					<button type="button" title="Dashboard" class="btn btn-primary dashboardBtn" key="'+secret+'" d_name="'+val.name+'">';
-					content +='						<!-- Dashboard -->';
-					content +='						<i class="fas fa-tachometer-alt"></i>';
-					content +='					</button>';
-					content +='				</div>';
-					content +='			</div>';
-					content +='		</div>';
-					content +='	</div>';
-					content +='</div>';
-				});
-				$('#deviceCard').html(content);
+					content += '<tr id=list'+list_count+'>';
+                    content += "<td>" + val.name + "</td>";
+                    content += "<td>" + type + "</td>";
+					content += "<td>" + val.time + "</td>";
+					content += '<td><button type="button" id="dataTableBtn" class="btn btn-primary" data-toggle="modal" data-target="#dataTable" key="'+key+'"><i class="fas fa-table"></i></button></td>';
+                    content += '<td><button type="button" id="deviceEditBtn" class="btn btn-primary" data-toggle="modal" data-target="#deviceEdit" key="'+key+'"><i class="fas fa-edit"></i></button></td>';
+					content += '</tr>';
+                });
+				$('.deviceTable').html(content);
             }
 		});
 	}
 
 	function deviceEditModalConfig(key) {
-		console.log(uid);
-		console.log(key);
-		
 		var database = firebase.database();
-        database.ref("users/" + uid + "/device/" + key).once('value', function (snapshot) {
+        database.ref("users/" + uid + "/device/" + key +"/").once('value', function (snapshot) {
             if (snapshot.exists()) {
 				var val = snapshot.val();
 				var type = val.type;
@@ -458,11 +466,7 @@
 				$('#deviceEditName').attr('placeholder',val.name);
 				$('#deviceSecret').val(val.secret);
 				secret = val.secret;
-				console.log(val);
-				
-			}
-			console.log(snapshot);
-			
+            }
 		});
 	}
 
@@ -486,44 +490,41 @@
 
 	function dataTableModalConfig(tkey) {
 		console.log(tkey);
+		
 		var database = firebase.database();
 		var content = '';
 		var type = '';
-		var content = '';
-        database.ref("telemetry/" + tkey + "/").orderByChild('timestamp').on('value', function (snapshot) {
+		console.log(secret);
+		content = '';
+			// database.ref("users/" + uid + "/device/" + tkey +"/").once('value', function (snapshot) {
+			//     if (snapshot.exists()) {
+			// 		var val = snapshot.val();
+			// 		secret = val.secret;
+			//     }
+			// });
+        database.ref("telemetry/" + secret + "/").endAt('status').on('value', function (snapshot) {
             if (snapshot.exists()) {
 				var val = snapshot.val();
-				var item = [];
 				type = val.type;
-				if (type) {
-					content = typeToHeader(type);
-					$('#dataHead').html(content);
-				}
-				
+				content = typeToHeader(type);
 				console.log(val);
 				console.log(type);
-				// console.log(content);
+				console.log(content);
+				$('#dataHead').html(content);
 				content = '';
                 snapshot.forEach(function (data) {
 					var val = data.val();
-					// console.log(val);
-					item.push(val);
-					console.log(item);
-					
-				});
-				item.reverse();
-				for (let index = 0; index < item.length; index++) {
-					const element = item[index];
-					if (element.time) {
+					console.log(val);
+					if (val.time) {
 						content += '<tr>';
-						content += "<td>" + element.time + "</td>";
-						content += "<td>" + element.humid + "</td>";
-						content += "<td>" + element.temp + "</td>";
-						content += "<td>" + element.light + "</td>";
+						content += "<td>" + val.time + "</td>";
+						content += "<td>" + val.humid + "</td>";
+						content += "<td>" + val.temp + "</td>";
+						content += "<td>" + val.light + "</td>";
 						content += '</tr>';
 					}
-				}
-				
+					console.log(content);
+                });
 				$('#dataBody').html(content);
             }
 		});
@@ -571,190 +572,39 @@
 		})
 	}
 
-	function addWidget(secret){
+	function addWidget(){
 		var mainData = $('#mainData').val();
 		var type = $('#widgetType').val();
+		var secret = $('#keepDevice').val();
 		
 		console.log(mainData);
 
-		database.ref("dashboard/"+secret+"/").once('value', function (snapshot) {
-			if (snapshot.exists()) {	
-				mainApp.AddWidget(type, mainData, secret);
-				console.log('added widget...');
-			} else {
-				console.log('failed adding widget...');
-			}
-		})
+		//mainApp.AddWidget(type, mainData);
 		
-	}
-	
-	function deleteWidget(secret, key) {		
-		database.ref("dashboard/"+secret+"/"+key).once('value', function (snapshot) {
+		database.ref("telemetry/"+secret+"/").limitToLast(22).on('value', function (snapshot) {
+		var arr = [];
+		var time_arr = [];
 			if (snapshot.exists()) {	
-				mainApp.DeleteWidget(secret, key);
-				console.log('deleted a widget...');
-			} else {
-				console.log('failed removing a widget...');
-			}
-		})
-	}
-
-	function callChart(secret) {
-		console.log('calling charts...');
-		
-		database.ref("dashboard/"+secret+"/").on('value', function (snapshot) {
-			if (snapshot.exists()) {	
-				var count = 1;
-				var widgetSet = [{"key":secret}];
-				var content = '';
-				$('#widgetCard').html('');
-				snapshot.forEach(function (data) {
+				snapshot.forEach(function (data, key) {
 					var val = data.val();
-					var key = data.key;
-					if (val.type) {
-						content +='<div class="col-md-6" >';
-						content +='	<div class="card">';
-						content +='		<div class="header">';
-						content +='			<button id="widgetEditBtn" type="button" class="close" key="'+key+'"><i class="fas fa-trash-alt"></i></button>';
-						content +='		</div>';
-						content +='		<div class="content">';
-						content +='			<canvas id="chart'+count+'"></canvas>';
-						content +='		</div>';
-						content +='	</div>';
-						content +='</div>';
-						
-						widgetSet.push(val);
-						// console.log(val.type);
-						count++;
-					}						
-				});
-				$('#widgetCard').append(content);
-				console.log(widgetSet);
-				drawChart(widgetSet);
-			} else {
-				console.log('cant find gadget data....');
-			}
-		});
-	}
-
-	function drawChart(set) {
-			
-		console.log(set[0].key);
-		
-		database.ref("telemetry/"+set[0].key+"/").limitToLast(22).on('value', function (snapshot) {
-			
-			var arr = [];
-			var time_arr = [];
-			if (snapshot.exists()) {
-				snapshot.forEach(function (data) {
-					var val = data.val();
-					if (val.time) {
-						arr.push(val);
+					if (val[mainData]) {
+						arr.push(val[mainData]);
 						time_arr.push(val.time);
 					}						
 				});
 			}
 			console.log(arr);
-			console.log(set);
-			set.forEach((element,i) => {
-				if (i>0) {
-					var mainData = element.data;
-					var type = element.type;
-					var value = [];
-					arr.forEach(ele => {
-						value.push(ele[mainData]);
-					});							
-					if (type.includes("All")) {
-						value = arr[19];
-					}
-					console.log(value);
-					// console.log(time_arr);
-					// console.log(mainData);
-					// console.log(type);
-					var target = $('#chart'+(i));
-					if ($(target).attr('class','chartjs-render-monitor')){
-						var parent = $(target).parent(); 
-						$(target).remove();
-						$(parent).append('<canvas id="chart'+i+'"></canvas>');
-						console.log('clear widget > '+i);
-						target = $('#chart'+(i));
-					}
-					// console.log(target);
-					var option = formatChartInfo(type, mainData, value, time_arr);
-					console.log(option);
-					var myChart = new Chart(target, option);
-					
-					
-				}
-			});
-		})
-	}
+			
 
-	function formatChartInfo(type,data,value,time) {
-		var option;
-		var color;
-		var label;
-		if (type == "barAll") {
-			color = [myFillColor[0],myBordorColor[0]];
-			label = ["Humidity","Light,","Temperature"];
-		} else if (data == "humid") {
-			color = [myFillColor[0],myBordorColor[0]];
-			label = "Humidity";
-		} else if (data == "light") {
-			color = [myFillColor[1],myBordorColor[1]];
-			label = "Light";
-		} else if (data == "temp") {
-			color = [myFillColor[2],myBordorColor[2]];
-			label = "Temperature";
-		}
-		if (type == "line" || type == "bar") {
-			option = {
+			var simpleLine = new Chart($("#newChart"), {
 				type: type,
 				data: {
-					labels: time,
+					labels: time_arr,
 					datasets: [{
-						label: label,
-						data: value,
-						backgroundColor: color[0],
-						borderColor: color[1]
-					}]
-				},
-				options:{
-					"scales":{
-						"yAxes":[{
-							"ticks":{
-								"beginAtZero":true
-							}
-						}]
-					}
-				}
-			}
-		} else if (type == "barAll") {
-			// console.log(value.humid);
-			// console.log(value.light);
-			// console.log(value.temp);
-			label = ["Humidity","Light","Temperature"];
-			option = {
-				type: 'bar',
-				data: {
-					labels: [value.time],
-					datasets: [{
-						label: label[0],
-						data: [value.humid],
+						label: mainData,
+						data: arr,
 						backgroundColor: myFillColor[0],
 						borderColor: myBordorColor[0]
-					},
-					{
-						label: label[1],
-						data: [value.light],
-						backgroundColor: myFillColor[1],
-						borderColor: myBordorColor[1]
-					},
-					{
-						label: label[2],
-						data: [value.temp],
-						backgroundColor: myFillColor[2],
-						borderColor: myBordorColor[2]
 					}]
 				},
 				options:{
@@ -766,10 +616,63 @@
 						}]
 					}
 				}
-			};
-		}		
-		return option;
-	}
+			});
+		});
+
+	};
+
+	function addChart(){
+		var mainData = $('#mainData').val();
+		var type = $('#widgetType').val();
+		var secret = $('#keepDevice').val();
+		
+		console.log(mainData);
+
+		mainApp.AddWidget(type, mainData);
+		
+		database.ref("telemetry/"+secret+"/").endAt(Status).limitToLast(20).on('value', function (snapshot) {
+			console.log(secret);
+			var arr = [];
+			var time_arr = [];
+			if (snapshot.exists()) {	
+				snapshot.forEach(function (data, key) {
+					var val = data.val();
+					console.log(val);	
+					console.log(val.humid);	
+					if (val[mainData]!=undefined) {
+						arr.push(val[mainData]);
+						time_arr.push(val.time);	
+					}
+										
+				});
+			}
+			console.log(arr);
+			
+
+			var simpleLine = new Chart($("#newChart"), {
+				type: type,
+				data: {
+					labels: time_arr,
+					datasets: [{
+						label: mainData,
+						data: arr,
+						backgroundColor: myFillColor[0],
+						borderColor: myBordorColor[0]
+					}]
+				},
+				options:{
+					"scales":{
+						"yAxes":[{
+							"ticks":{
+								"beginAtZero":true
+							}
+						}]
+					}
+				}
+			});
+		});
+
+	};
 
 	function addDevice(){
 		var timestamp = firebase.database.ServerValue.TIMESTAMP;
@@ -787,6 +690,94 @@
 		$('#deviceName').val('');
 	};
 
+	
+
+	database.ref("tele/").limitToLast(20).on('value', function (snapshot) {
+		arr = [];
+		newArr = [];
+		time_arr = [];
+		ran_arr = [];
+		new1 = 0;
+		new2 = 0;
+		new3 = '';
+		if (snapshot.exists()) {	
+			snapshot.forEach(function (data) {
+				var val = data.val();
+				arr.push(val.value);
+				newArr.push(val.humid);
+				time_arr.push(val.time);
+				ran_arr.push(Math.floor((Math.random() * 100) + 1));
+				new1 = val.humid;
+				new2 = val.temp;
+				new3 = val.light;
+				new_date = val.time;
+				
+			});
+		}
+		// console.log(arr);
+		// console.log(time_arr);
+		// console.log(ran_arr);
+		// console.log(new1);
+		// console.log(new2);
+		// console.log(new3);
+		// console.log(new_date);
+		
+		var simpleLine = new Chart(ctx, {
+			type: 'line',
+			data: {
+				labels: time_arr,
+				datasets: [{
+					label: 'Humid',
+					data: arr,
+					backgroundColor: myFillColor[0],
+					borderColor: myBordorColor[0]
+				}]
+			},
+			options:{
+				"scales":{
+					"yAxes":[{
+						"ticks":{
+							"beginAtZero":true
+						}
+					}]
+				}
+			}
+		});
+
+		var myBarChart = new Chart(ctx1, {
+			type: 'bar',			
+			data: {
+				label: ['Humid','Temp','Light'],
+				datasets: [{
+					label: 'Humid',
+					data: [new1],
+					backgroundColor: myFillColor[0],
+					borderColor: myBordorColor[0]
+				},
+				{
+					label: 'Temp',
+					data: [new2],
+					backgroundColor: myFillColor[1],
+					borderColor: myBordorColor[1]
+				},			
+				{
+					label: 'Light',
+					data: [new3],
+					backgroundColor: myFillColor[2],
+					borderColor: myBordorColor[2]
+				},
+			
+			]},
+			options:{
+				"scales":{
+					"yAxes":[{
+						"ticks":{
+							"beginAtZero":true
+						}
+					}]
+				}
+			}
+		});
 
 		// var simpleLineHigh = Highcharts.chart('lineChart', {
 		// 	chart: {
@@ -814,6 +805,8 @@
 		// 		data: ran_arr
 		// 	}]
 		// });
+	});
+
 	
 	
 </script>

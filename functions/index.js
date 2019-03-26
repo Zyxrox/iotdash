@@ -2,8 +2,9 @@ var functions = require('firebase-functions');
 var admin = require('firebase-admin');
 var express = require('express');
 var app = express();
+var path = require('path');
 var firebase = admin.initializeApp(functions.config().firebase);
-  
+
 exports.helloWorld = functions.https.onRequest((req, res) => {
     res.send("Hello from Firebase!");
 });
@@ -15,8 +16,7 @@ exports.addPlantData = functions.https.onRequest((req, res) => {
     var url = req.originalUrl;
     var date = genDatetime();
 
-    // res.status(200).send("url = "+text);
-    return admin.database().ref('testAPI/'+secret+'/').push().set({
+    admin.database().ref('testAPI/' + secret + '/').push().set({
         humid: humid,
         temp: temp,
         light: light,
@@ -24,26 +24,27 @@ exports.addPlantData = functions.https.onRequest((req, res) => {
         timestamp: admin.database.ServerValue.TIMESTAMP
     }).then((snapshot) => {
         // return res.redirect(303, snapshot.ref.toString());
-        return res.status(200).send("url = "+url);
-    });
-});
-exports.posts = functions.https.onRequest((req, res) => {
-    var postsRef = firebase.database().ref('tele/');
-    postsRef.once('value').then(function (snap) {
-        res.status(200).json({
-            posts: snap.val()
-        });
+        return res.status(200).send("url = " + url);
     });
 });
 
-exports.testURL = functions.https.onRequest((req, res) => {
-    var text = req.originalUrl;
 
-    res.status(200).send("url = "+text);
-    res.end("url = "+text);
+exports.getDashboard = functions.https.onRequest((req, res) => {
+    var secret = req.query.secret;
+
+    // res.sendFile(path.join(__dirname, '../public', 'widget.html') );
+    if (secret) {
+        res.redirect(301, 'https://iotdash.firebaseapp.com/widget.html?secret='+secret);
+        // res.redirect(301, 'http://localhost/iotdash/public/widget.html?secret='+secret);
+    } else {
+        res.redirect(404, 'https://iotdash.firebaseapp.com/404.html');
+        // res.redirect(404, 'http://localhost/iotdash/public/404.html');
+    }
+
+    // return res.status(200).send("url = " + text);
 });
 
-function genDatetime(){
+function genDatetime() {
     var dayFormat = new Date();
 
     var date =
@@ -60,5 +61,5 @@ function genDatetime(){
         ':' +
         dayFormat.getMilliseconds().toString();
 
-    return date+" "+time;
+    return date + " " + time;
 }

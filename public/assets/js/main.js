@@ -2,19 +2,27 @@ var mainApp = {};
 
 (function(){  
     var firebase = app_firebase;
-    uid = null;
     firebase.auth().onAuthStateChanged(function(user) {
-    if (user != null) {
+        console.log('auth state changed');
+        
+        if (user) {
             name = user.displayName;
             email = user.email;
             photoUrl = user.photoURL;
             emailVerified = user.emailVerified;
             uid = user.uid; 
+            $(".profile").html("Hello, 	" + name + '<b class="caret"></b>');
+            $("button.device-home").trigger('click');
             checkNewUser();
-    }
-        else{
-            uid = null;
-            window.location.replace("index.html");
+        } else {
+            name = null;
+            email = null;
+            photoUrl = null;
+            emailVerified = null;
+            if (!window.location.pathname.includes("index.html")) {
+                console.log(window.location.pathname);
+                window.location.replace("index.html");
+            }
         }
     });
 
@@ -36,7 +44,7 @@ var mainApp = {};
     }
 
     function checkNewUser() {
-        console.log('checking user...');
+        console.log('checking user...' + name);
         firebase.database().ref('users/').child(uid).once('value').then(function (snap) {
             if (!snap.exists()) {
                 createUser();
@@ -47,6 +55,7 @@ var mainApp = {};
     }
 
     function logOut() {
+        uid = null;
         firebase.auth().signOut();
         alert("Sign out");
     }
@@ -121,6 +130,12 @@ var mainApp = {};
         console.log('added widget...');
     }
 
+    function deleteWidget(key,secret) {
+        var path = 'dashboard/'+ key + '/' + secret;
+        app_firebase.databaseApi.delete(path, massageHandler);
+        console.log('deleted a widget...');
+    }
+
     function fnCreate() {        
         var path = 'users/' + uid;
         var data = {
@@ -129,12 +144,12 @@ var mainApp = {};
         app_firebase.databaseApi.create(path, data, massageHandler);
     }
 
-    function fnRead() {
-        var path = 'users/' + uid;
+    function fnRead(path) {
         app_firebase.databaseApi.read(path, successFn, massageHandler);
         function successFn(snapShot) {
             if (!!snapShot) {
                 console.log(snapShot.val());
+                return snapShot.val();
             } else {
                 console.log('No data found :(');
             } 
@@ -183,5 +198,6 @@ var mainApp = {};
     mainApp.UpdateDevice = updateDevice;
     mainApp.DeleteDevice = deleteDevice;
     mainApp.AddWidget = addWidget;
+    mainApp.DeleteWidget = deleteWidget;
 
 })()
